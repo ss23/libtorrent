@@ -34,22 +34,36 @@ UriParserTest::test_basic() {
   CPPUNIT_ASSERT(state.state != torrent::utils::uri_state::state_invalid);
 }
 
-#define MAGNET_BASIC "magnet:?xt=urn:sha1:YNCKHTQCWBTRNJIV4WNAE52SJUQCZO5C"
+#define BASIC_MAGNET "magnet:?xt=urn:sha1:YNCKHTQCWBTRNJIV4WNAE52SJUQCZO5C"
+#define BASIC_UDP "udp://tracker.openbittorrent.com:80"
 
 void
 UriParserTest::test_basic_magnet() {
   torrent::utils::uri_state state;
-
-  uri_parse_str(MAGNET_BASIC, state);
-
+  uri_parse_str(BASIC_MAGNET, state);
   test_print_uri_state(state);
 
   CPPUNIT_ASSERT(state.state == torrent::utils::uri_state::state_valid);
 
-  CPPUNIT_ASSERT(state.uri == MAGNET_BASIC);
+  CPPUNIT_ASSERT(state.uri == BASIC_MAGNET);
   CPPUNIT_ASSERT(state.scheme == "magnet");
   CPPUNIT_ASSERT(state.resource == "");
   CPPUNIT_ASSERT(state.query == "xt=urn:sha1:YNCKHTQCWBTRNJIV4WNAE52SJUQCZO5C");
+  CPPUNIT_ASSERT(state.fragment == "");
+}
+
+void
+UriParserTest::test_basic_udp() {
+  torrent::utils::uri_state state;
+  uri_parse_str(BASIC_UDP, state);
+  test_print_uri_state(state);
+
+  CPPUNIT_ASSERT(state.state == torrent::utils::uri_state::state_valid);
+
+  CPPUNIT_ASSERT(state.uri == BASIC_UDP);
+  CPPUNIT_ASSERT(state.scheme == "udp");
+  CPPUNIT_ASSERT(state.resource == "//tracker.openbittorrent.com:80");
+  CPPUNIT_ASSERT(state.query == "");
   CPPUNIT_ASSERT(state.fragment == "");
 }
 

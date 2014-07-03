@@ -44,14 +44,76 @@
 
 namespace torrent { namespace utils {
 
+// TODO: Move?
+// TODO: Add verification of escaped chars.
+
 inline bool
-is_unreserved_uri_char(char c) {
+is_uri_alphanum(char c) {
   return
     (c >= 'A' && c <= 'Z') ||
     (c >= 'a' && c <= 'z') ||
-    (c >= '0' && c <= '9') ||
+    (c >= '0' && c <= '9');
+}
+
+inline bool
+is_uri_hex(char c) {
+  return
+    (c >= 'A' && c <= 'F') ||
+    (c >= 'a' && c <= 'f') ||
+    (c >= '0' && c <= '9');
+}
+
+inline bool
+is_uri_mark(char c) {
+  return
+    c == '-' || c == '_' || c == '.' || c == '!' ||
+    c == '~' || c == '*' || c == '\'' || c == '(' ||
+    c == ')';
+}
+
+inline bool
+is_uri_gen_delim(char c) {
+  return
+    c == ':' || c == '/' || c == '?' || c == '#' ||
+    c == '[' || c == ']' || c == '@';
+}
+
+inline bool
+is_uri_sub_delim(char c) {
+  return
+    c == '!' || c == '$' || c == '&' || c == '\'' ||
+    c == '(' || c == ')' || c == '*' || c == '+' ||
+    c == ',' || c == ';' || c == '=';
+}
+
+inline bool
+is_uri_unreserved(char c) {
+  return is_uri_alphanum(c) ||
     c == '-' || c == '_' || c == '.' || c == '~';
 }
+
+inline bool
+is_uri_scheme(char c) {
+  return is_uri_alphanum(c) ||
+    c == '+' || c == '-' || c == '.';
+}
+
+
+
+// inline bool
+// is_uri_hierarchical(char c) {
+//   return is_uri_alphanum(c) || is_uri_mark(c) ||
+//     c == '%' ||
+    
+
+    // "$" | "," |        ";" | ":" | "@" | "&" | "=" | "+"
+
+
+    // c == ':' || c == '&' || c == '=' || c == '/' ||
+    // ;
+// }
+
+// escaped | "$" | "," |  ";" | ":" | "@" | "&" | "=" | "+" )
 
 inline bool
 is_valid_uri_query_char(char c) {
@@ -76,7 +138,7 @@ is_unreserved_uri_query_char(char c) {
 
 inline bool
 is_not_unreserved_uri_char(char c) {
-  return !is_unreserved_uri_char(c);
+  return !is_uri_unreserved(c);
 }
 
 inline bool
