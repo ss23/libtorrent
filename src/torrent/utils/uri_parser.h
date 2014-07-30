@@ -76,20 +76,66 @@ struct uri_query_state : public uri_base_state {
 };
 
 void uri_parse_str(std::string uri, uri_state& state) LIBTORRENT_EXPORT;
-void uri_parse_c_str(const char* uri, uri_state& state) LIBTORRENT_EXPORT;
 
 void uri_parse_resource(std::string query, uri_query_state& state) LIBTORRENT_EXPORT;
 void uri_parse_resource_authority(std::string query, uri_query_state& state) LIBTORRENT_EXPORT;
 void uri_parse_resource_path(std::string query, uri_query_state& state) LIBTORRENT_EXPORT;
 
 void uri_parse_query_str(std::string query, uri_query_state& state) LIBTORRENT_EXPORT;
-void uri_parse_query_c_str(const char* query, uri_query_state& state) LIBTORRENT_EXPORT;
 
 class LIBTORRENT_EXPORT uri_error : public ::torrent::input_error {
 public:
   uri_error(const char* msg) : ::torrent::input_error(msg) {}
   uri_error(const std::string& msg) : ::torrent::input_error(msg) {}
 };
+
+////
+////
+////
+
+struct uri_parse_result {
+  static const int scheme_invalid = 0;
+  static const int scheme_unknown = 1;
+  static const int scheme_http = 2;
+  static const int scheme_magnet = 3;
+  static const int scheme_udp = 4;
+
+  uri_parse_result();
+
+  int         scheme;
+};
+
+struct uri_parse_authority : public uri_base_state {
+  std::string userinfo;
+  std::string hostname;
+  uint16_t    port;
+};
+
+const char* uri_parse_scheme(const char* first, const char* last, int& result) LIBTORRENT_EXPORT;
+const char* uri_parse_authority(const char* first, const char* last, uri_parse_authority& result) LIBTORRENT_EXPORT;
+
+inline int
+uri_parse_scheme_str(const std::string& str) {
+  int result;
+  uri_parse_scheme(str.c_str(), str.c_str() + str.size(), result);
+  return result;
+}
+
+inline uri_parse_authority
+uri_parse_authority_str(const std::string& str) {
+  uri_parse_authority result;
+  uri_parse_authority(str.c_str(), str.c_str() + str.size(), result);
+  return result;
+}
+
+//
+// Internal:
+//
+
+inline
+uri_parse_result::uri_parse_result() :
+  scheme(scheme_invalid) {
+}
 
 }}
 
