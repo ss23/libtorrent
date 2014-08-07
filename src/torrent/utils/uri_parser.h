@@ -83,12 +83,6 @@ void uri_parse_resource_path(std::string query, uri_query_state& state) LIBTORRE
 
 void uri_parse_query_str(std::string query, uri_query_state& state) LIBTORRENT_EXPORT;
 
-class LIBTORRENT_EXPORT uri_error : public ::torrent::input_error {
-public:
-  uri_error(const char* msg) : ::torrent::input_error(msg) {}
-  uri_error(const std::string& msg) : ::torrent::input_error(msg) {}
-};
-
 ////
 ////
 ////
@@ -105,28 +99,23 @@ struct uri_parse_result {
   int         scheme;
 };
 
-struct uri_parse_authority : public uri_base_state {
+struct uri_parse_authority_result : public uri_base_state {
   std::string userinfo;
   std::string hostname;
   uint16_t    port;
 };
 
 const char* uri_parse_scheme(const char* first, const char* last, int& result) LIBTORRENT_EXPORT;
-const char* uri_parse_authority(const char* first, const char* last, uri_parse_authority& result) LIBTORRENT_EXPORT;
+const char* uri_parse_authority(const char* first, const char* last, uri_parse_authority_result& result) LIBTORRENT_EXPORT;
 
-inline int
-uri_parse_scheme_str(const std::string& str) {
-  int result;
-  uri_parse_scheme(str.c_str(), str.c_str() + str.size(), result);
-  return result;
-}
+inline int uri_parse_scheme_str(const std::string& str);
+inline uri_parse_authority_result uri_parse_authority_str(const std::string& str);
 
-inline uri_parse_authority
-uri_parse_authority_str(const std::string& str) {
-  uri_parse_authority result;
-  uri_parse_authority(str.c_str(), str.c_str() + str.size(), result);
-  return result;
-}
+class LIBTORRENT_EXPORT uri_error : public ::torrent::input_error {
+public:
+  uri_error(const char* msg) : ::torrent::input_error(msg) {}
+  uri_error(const std::string& msg) : ::torrent::input_error(msg) {}
+};
 
 //
 // Internal:
@@ -135,6 +124,20 @@ uri_parse_authority_str(const std::string& str) {
 inline
 uri_parse_result::uri_parse_result() :
   scheme(scheme_invalid) {
+}
+
+inline int
+uri_parse_scheme_str(const std::string& str) {
+  int result;
+  uri_parse_scheme(str.c_str(), str.c_str() + str.size(), result);
+  return result;
+}
+
+inline uri_parse_authority_result
+uri_parse_authority_str(const std::string& str) {
+  uri_parse_authority_result result;
+  uri_parse_authority(str.c_str(), str.c_str() + str.size(), result);
+  return result;
 }
 
 }}

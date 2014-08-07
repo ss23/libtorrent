@@ -182,11 +182,28 @@ uri_parse_scheme(const char* first, const char* last, int& result) {
 }
 
 const char*
-uri_parse_authority(const char* first, const char* last, uri_parse_authority& result) {
-  // First parse userinfo...
+uri_parse_authority(const char* first, const char* last, uri_parse_authority_result& result) {
+  const char* next;
 
-  
+  // First parse userinfo...
+  next = std::find_if(first, last, std::ptr_fun(&is_not_uri_scheme));
+
+
+  return next;
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 //
 //
@@ -254,49 +271,6 @@ uri_parse_str(std::string uri, uri_state& state) {
   return;
 }
 
-
-// void
-// uri_parse_str(std::string uri, uri_state& state) {
-//   if (state.state != uri_state::state_empty)
-//     throw uri_error("uri_state.state is not uri_state::state_empty");
-
-//   state.uri.swap(uri);
-//   state.state = uri_state::state_invalid;
-
-//   std::string::const_iterator first = state.uri.begin();
-//   std::string::const_iterator last = state.uri.end();
-
-//   // Parse scheme:
-//   first = uri_string_copy_until(first, last, state.scheme, std::ptr_fun(&is_not_unreserved_uri_char));
-
-//   if (first == last)
-//     goto uri_parse_success;
-
-//   if (*first++ != ':')
-//     uri_parse_throw_error("could not find ':' after scheme, found character 0x", *--first);
-
-//   // Parse resource:
-//   first = uri_string_copy_until(first, last, state.resource, std::ptr_fun(&is_not_unreserved_uri_char));
-
-//   if (first == last)
-//     goto uri_parse_success;
-
-//   if (*first++ != '?')
-//     uri_parse_throw_error("could not find '?' after resource, found character 0x", *--first);
-
-//   // Parse query:
-//   first = uri_string_copy_until(first, last, state.query, std::ptr_fun(&is_not_valid_uri_query_char));
-
-//   if (first == last)
-//     goto uri_parse_success;
-
-//   if (*first++ != '#')
-//     uri_parse_throw_error("could not find '#' after query, found character 0x", *--first);
-
-//  uri_parse_success:
-//   state.state = uri_state::state_valid;
-//   return;
-// }
 
 // * Letters (A-Z and a-z), numbers (0-9) and the characters
 //   '.','-','~' and '_' are left as-is
