@@ -178,7 +178,7 @@ uri_parse_scheme(const char* first, const char* last, int& result) {
     result = uri_parse_result::scheme_unknown;
   }
 
-  return next;
+  return ++next;
 }
 
 const char*

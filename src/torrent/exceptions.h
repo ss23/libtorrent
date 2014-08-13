@@ -197,6 +197,12 @@ public:
   virtual ~shutdown_exception() throw() {}
 };
 
+class LIBTORRENT_EXPORT uri_error : public ::torrent::input_error {
+public:
+  uri_error(const char* msg) : ::torrent::input_error(msg) {}
+  uri_error(const std::string& msg) : ::torrent::input_error(msg) {}
+};
+
 }
 
 #endif

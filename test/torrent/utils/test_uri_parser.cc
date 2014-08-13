@@ -2,6 +2,8 @@
 
 #include "test_uri_parser.h"
 
+#include "helpers.h"
+
 #include <inttypes.h>
 #include <iostream>
 #include <torrent/utils/uri_parser.h>
@@ -94,8 +96,17 @@ UriParserTest::tearDown() {
 ///
 ///
 
-#define BASIC_MAGNET "magnet:?xt=urn:sha1:YNCKHTQCWBTRNJIV4WNAE52SJUQCZO5C"
-#define BASIC_UDP "udp://tracker.openbittorrent.com:80"
+// inline uri_parse_authority_result
+// uri_parse_authority_str(const std::string& str) {
+//   uri_parse_authority_result result;
+//   uri_parse_authority(str.c_str(), str.c_str() + str.size(), result);
+//   return result;
+// }
+
+#define BASIC_MAGNET_SCHEME "magnet:\xff\xff"
+#define BASIC_UDP_SCHEME "udp:\xff\xff"
+
+#define BASIC_MAGNET_AUTHORITY "xt=urn:sha1:YNCKHTQCWBTRNJIV4WNAE52SJUQCZO5C"
 
 #define QUERY_MAGNET_QUERY                              \
   "xt=urn:ed2k:31D6CFE0D16AE931B73C59D7E0C089C0"        \
@@ -119,9 +130,12 @@ void
 UriParserTest::test_scheme() {
   CPPUNIT_ASSERT(torrent::utils::uri_parse_result().scheme == torrent::utils::uri_parse_result::scheme_invalid);
 
-  CPPUNIT_ASSERT(torrent::utils::uri_parse_scheme_str("http://example.com") == torrent::utils::uri_parse_result::scheme_http);
-  CPPUNIT_ASSERT(torrent::utils::uri_parse_scheme_str(BASIC_MAGNET) == torrent::utils::uri_parse_result::scheme_magnet);
-  CPPUNIT_ASSERT(torrent::utils::uri_parse_scheme_str(BASIC_UDP) == torrent::utils::uri_parse_result::scheme_udp);
+  CPPUNIT_ASSERT(torrent::utils::uri_parse_scheme_str("http:\x00\x00") == torrent::utils::uri_parse_result::scheme_http);
+  CPPUNIT_ASSERT(torrent::utils::uri_parse_scheme_str("http:\xff\xff") == torrent::utils::uri_parse_result::scheme_http);
+  CPPUNIT_ASSERT(torrent::utils::uri_parse_scheme_str("http://") == torrent::utils::uri_parse_result::scheme_http);
+  CPPUNIT_ASSERT(torrent::utils::uri_parse_scheme_str("http:a") == torrent::utils::uri_parse_result::scheme_http);
+  CPPUNIT_ASSERT(torrent::utils::uri_parse_scheme_str(BASIC_MAGNET_SCHEME) == torrent::utils::uri_parse_result::scheme_magnet);
+  CPPUNIT_ASSERT(torrent::utils::uri_parse_scheme_str(BASIC_UDP_SCHEME) == torrent::utils::uri_parse_result::scheme_udp);
 
   CPPUNIT_ASSERT(torrent::utils::uri_parse_scheme_str("uf+ufu://example.com") == torrent::utils::uri_parse_result::scheme_unknown);
   CPPUNIT_ASSERT(torrent::utils::uri_parse_scheme_str("uf-ufu://example.com") == torrent::utils::uri_parse_result::scheme_unknown);
@@ -132,6 +146,39 @@ UriParserTest::test_scheme() {
   CPPUNIT_ASSERT(torrent::utils::uri_parse_scheme_str("foo_bar://example.com") == torrent::utils::uri_parse_result::scheme_invalid);
 }
 
+inline bool
+match_uri_result_with_c_str(const std::string& result, const char* expected) {
+  return (expected == NULL && result.empty()) || (expected != NULL && result != userinfo);
+}
+
+bool
+match_uri_parse_authority(const std::string& input,
+                          const char* userinfo,
+                          const char* hostname,
+                          uint16_t port) {
+  torrent::utils::uri_parse_authority_result result;
+
+  if (torrent::utils::uri_parse_authority(str.c_str(), str.c_str() + str.size(), result) != str.c_str() + str.size())
+    return false;
+  
+  if (result.state != torrent::utils::uri_parse_authority_result::state_valid)
+    return false;
+  
+  if (match_uri_result_with_c_str(result.userinfo, userinfo)) return false;
+  if (match_uri_result_with_c_str(result.hostname, hostname)) return false;
+  if (result.port != port) return false;
+
+  return true
+}
+
+#define UDP_AUTHORITY_BASIC "tracker.openbittorrent.com"
+#define UDP_AUTHORITY_WITH_PORT "tracker.openbittorrent.com:80"
+#define UDP_AUTHORITY_WITH_USERINFO "tracker.openbittorrent.com:80"
+
 void
 UriParserTest::test_authority() {
+  CPPUNIT_ASSERT(torrent::utils::uri_parse_authority_result().state == torrent::utils::uri_parse_authority_result::state_invalid);
+  CPPUNIT_ASSERT(torrent::utils::uri_parse_authority_result().port == 0);
+
+  CPPUNIT_ASSERT(match_uri_parse_authority(UDP_AUTHORITY_BASIC, NULL, "tracker.openbittorrent.com", NULL));
 }

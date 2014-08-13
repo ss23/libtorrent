@@ -6,6 +6,7 @@
 #include "net/address_list.h"
 
 #include "globals.h"
+#include "helpers.h"
 #include "tracker_list_test.h"
 #include "tracker_list_features_test.h"
 
@@ -177,20 +178,6 @@ tracker_list_features_test::test_count_active() {
 }
 
 // Add separate functions for sending state to multiple trackers...
-
-
-bool
-verify_did_internal_error(std::function<void ()> func, bool should_throw) {
-  bool did_throw = false;
-
-  try {
-    func();
-  } catch (torrent::internal_error& e) {
-    did_throw = true;
-  }
-
-  return should_throw == did_throw;
-}
 
 void
 tracker_list_features_test::test_request_safeguard() {

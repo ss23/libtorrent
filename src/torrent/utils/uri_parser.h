@@ -100,6 +100,8 @@ struct uri_parse_result {
 };
 
 struct uri_parse_authority_result : public uri_base_state {
+  uri_parse_authority_result() : port(0) {}
+
   std::string userinfo;
   std::string hostname;
   uint16_t    port;
@@ -110,12 +112,6 @@ const char* uri_parse_authority(const char* first, const char* last, uri_parse_a
 
 inline int uri_parse_scheme_str(const std::string& str);
 inline uri_parse_authority_result uri_parse_authority_str(const std::string& str);
-
-class LIBTORRENT_EXPORT uri_error : public ::torrent::input_error {
-public:
-  uri_error(const char* msg) : ::torrent::input_error(msg) {}
-  uri_error(const std::string& msg) : ::torrent::input_error(msg) {}
-};
 
 //
 // Internal:
